@@ -1,0 +1,14 @@
+/* app global css */
+.tdel{
+  text-decoration: line-through;
+  color: red;
+}
+.tadd{
+  text-decoration: underline;
+  color: blue;
+}
+.tfix{
+  word-wrap: break-word;
+  white-space: pre-line;
+  display: inline-block;
+}
