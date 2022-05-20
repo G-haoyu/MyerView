@@ -159,7 +159,10 @@ export default {
         let id = this.resolveID(this.myOption.series.at(location).id)
         // 显示当前 k 线 id.k
         let kLinesIndex = id.k + this.yAxisLabelLength - 1
-        this.myOption.series.at(-this.drawOb.d - 3).markLine.data = [this.kArray[kLinesIndex]]
+        if(kLinesIndex >=0 && kLinesIndex < this.kArray.length)
+          this.myOption.series.at(-this.drawOb.d - 3).markLine.data = [this.kArray[kLinesIndex]]
+        else
+          this.myOption.series.at(-this.drawOb.d - 3).markLine.data = []
         this.reloadChart2()
         // 删除当前数据
         this.myOption.series.at(location).data = []
@@ -197,8 +200,11 @@ export default {
         let id = this.resolveID(this.myOption.series.at(location).id)
         // 显示当前 k 线 id.k
         let kLinesIndex = id.k + this.yAxisLabelLength - 1
-        this.myOption.series.at(-this.drawOb.d - 3).markLine.data = [this.kArray[kLinesIndex]]
-        this.reloadChart2()
+        if(kLinesIndex >=0 && kLinesIndex < this.kArray.length)
+          this.myOption.series.at(-this.drawOb.d - 3).markLine.data = [this.kArray[kLinesIndex]]
+        else
+        this.myOption.series.at(-this.drawOb.d - 3).markLine.data = []
+          this.reloadChart2()
         // 添加当前数据
         this.myOption.series.at(location).data = JSON.parse(this.undoStack.shift())
         // 判断是否开始一轮 d ，id.d !== nowD，如果开始则先删除dCount
