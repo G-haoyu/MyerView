@@ -1,7 +1,7 @@
 <template>
   <q-page class="row justify-center">
 
-    <div class="col-12 col-md-10" id="main"></div>
+    <div class="col-12 col-md-11" id="main"></div>
 
     <q-page-sticky position="bottom-right" :offset="fabPos">
       <q-fab
@@ -17,6 +17,8 @@
       >
         <q-fab-action padding="3px" color="warning" icon="redo" @click="redoStep" label="向前一步(差异+1)" />
         <q-fab-action padding="3px" color="info" icon="undo" @click="undoStep" label="退后一步(差异-1)" />
+        <q-fab-action padding="3px" color="warning" icon="keyboard_double_arrow_right" @click="redoAuto" label="自动前进(差异++)" />
+        <q-fab-action padding="3px" color="info" icon="keyboard_double_arrow_left" @click="undoAuto" label="自动后退(差异--)" />
       </q-fab>
     </q-page-sticky>
 
@@ -26,11 +28,9 @@
 </template>
 
 <script>
-import * as echarts from 'echarts';
-
 import echartsUtils from "../js/echatsUtils";
 
-import { defineComponent, onMounted, onUnmounted, onUpdated, reactive, ref, toRefs } from 'vue';
+import { defineComponent, onMounted, onUnmounted, onUpdated, ref, toRefs } from 'vue';
 
 export default defineComponent({
   name: 'MyersChart',
@@ -62,6 +62,8 @@ export default defineComponent({
     let seamless = ref(true)
     let fabPos = ref([18, 18])
     let draggingFab = ref(false)
+    let redoAutoFlag = ref({})
+    let undoAutoFlag = ref({})
 
     let myChart = ref({});
 
@@ -76,7 +78,8 @@ export default defineComponent({
 
     onUpdated(() => {
       // 重新初始化Option
-
+      clearInterval(redoAutoFlag.value)
+      clearInterval(undoAutoFlag.value)
       echartsUtils.updateOption(stringA.value, stringB.value, drawOb.value)
 
 
@@ -84,6 +87,8 @@ export default defineComponent({
 
     onUnmounted(() => {
       echartsUtils.destory()
+      clearInterval(redoAutoFlag.value)
+      clearInterval(undoAutoFlag.value)
     })
 
     return {
@@ -94,6 +99,8 @@ export default defineComponent({
       seamless,
       fabPos,
       draggingFab,
+      redoAutoFlag,
+      undoAutoFlag,
       moveFab (ev) {
         draggingFab.value = ev.isFirst !== true && ev.isFinal !== true
 
@@ -103,13 +110,34 @@ export default defineComponent({
         ]
     },
     redoStep() {
+      clearInterval(redoAutoFlag.value)
+      clearInterval(undoAutoFlag.value)
       seamless.value = true
-      // echartsUtils.reloadChart()
       fabLabel.value = echartsUtils.redo()
     },
     undoStep() {
+      clearInterval(redoAutoFlag.value)
+      clearInterval(undoAutoFlag.value)
       seamless.value = true
       fabLabel.value = echartsUtils.undo()
+    },
+    redoAuto() {
+      clearInterval(undoAutoFlag.value)
+      seamless.value = true
+      redoAutoFlag.value = setInterval(() => {
+        fabLabel.value = echartsUtils.redo()
+        if(fabLabel.value === "可视化回放")
+          clearInterval(redoAutoFlag.value)
+      }, 500)
+    },
+    undoAuto() {
+      clearInterval(redoAutoFlag.value)
+      seamless.value = true
+      undoAutoFlag.value = setInterval(() => {
+        fabLabel.value = echartsUtils.undo()
+        if(fabLabel.value === "可视化回放")
+          clearInterval(undoAutoFlag.value)
+      }, 500)
     }
     };
 

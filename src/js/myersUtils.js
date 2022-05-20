@@ -7,9 +7,7 @@ export default {
   },
   whenChange(strA, strB) {
     let vss = this.generatePath(strA, strB)
-    // console.log(vss)
     let so = this.solution(vss.vs, strA.length, strB.length, vss.d)
-    // console.log(so)
     let res = this.generateDiffView(so.snakes, strA, strB)
 
     this.textADOM.innerHTML = res.strA

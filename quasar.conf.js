@@ -138,8 +138,8 @@ module.exports = configure(function (ctx) {
       },
 
       manifest: {
-        name: `MyerView`,
-        short_name: `MyerView`,
+        name: `Myer's View`,
+        short_name: `MyersView`,
         description: `An online visual website based on Myer's diff algorithm`,
         display: 'standalone',
         orientation: 'portrait',

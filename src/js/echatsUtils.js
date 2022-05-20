@@ -39,6 +39,9 @@ export default {
     if(stringA.length !== 0 && stringB.length !== 0) {
       this.nowD = drawOb.d
       this.nowP = 0
+      this.undoStack = []
+      this.undoStack2 = []
+      this.showRightPath = true
       this.xAxisLabelValue = stringA.split("")
       this.yAxisLabelValue = stringB.split("")
       this.xAxisLabelValue.unshift("")
@@ -50,7 +53,6 @@ export default {
       this.drawOb = drawOb
       this.drawOb["dConts"] = []
       console.log(drawOb)
-      console.log(drawOb.allPaths)
       // 正确路径
       let rightPathData = {
         id: 'rightPath',
@@ -131,12 +133,10 @@ export default {
   },
 
   reloadChart() {
-    console.log(this.myOption)
     this.myChart.setOption(this.myOption, true)
   },
 
   reloadChart2() {
-    console.log(this.myOption)
     this.myChart.setOption(this.myOption, false)
   },
 
@@ -150,7 +150,7 @@ export default {
         let location = -this.drawOb.d - 4
         this.undoStack.unshift(JSON.stringify(this.myOption.series.at(location).data))
         this.myOption.series.at(location).data = []
-        result = "当前差异："+this.nowD
+        result = "nowD: "+this.nowD
       }
       // 如果还能倒退，且showRightPath为false
       else if(this.nowD > 0 && this.showRightPath === false) {
@@ -193,7 +193,6 @@ export default {
       // 如果还能前进，且showRightPath为false
       else if(this.nowD <= this.drawOb.d && this.nowP !== 0) {
         let location = -this.drawOb.d - 4 - this.nowP
-        console.log(location)
         // this.undoStack.unshift(JSON.stringify(this.myOption.series.at(location).data))
         let id = this.resolveID(this.myOption.series.at(location).id)
         // 显示当前 k 线 id.k

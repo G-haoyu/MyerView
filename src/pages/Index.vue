@@ -19,7 +19,7 @@
           label-slot
           counter
           debounce="1000"
-          maxlength="2000"
+          maxlength="200"
           :rules="[val => !!val.length || '不能为空']"
           >
             <template v-slot:label>
@@ -38,7 +38,7 @@
           label-slot
           counter
           debounce="1000"
-          maxlength="2000"
+          maxlength="200"
           :rules="[val => !!val.length || '不能为空']"
         >
           <template v-slot:label>
@@ -94,7 +94,7 @@
 <script>
 import myersUtils from '../js/myersUtils'
 
-import { defineComponent, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
 import MyersChart from 'src/components/MyersChart.vue';
 
 export default defineComponent({
