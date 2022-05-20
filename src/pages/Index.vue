@@ -5,7 +5,10 @@
     </div>
 
     <div class="row justify-center">
-      <h5>Myer's差分算法可视化</h5>
+      <h5>
+        Myer's差分算法可视化
+        <q-badge align="top" color="primary">v1.0</q-badge>
+      </h5>
     </div>
 
     <div class="row justify-center">

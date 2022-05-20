@@ -19,6 +19,7 @@
         <q-fab-action padding="3px" color="info" icon="undo" @click="undoStep" label="退后一步(差异-1)" />
         <q-fab-action padding="3px" color="warning" icon="keyboard_double_arrow_right" @click="redoAuto" label="自动前进(差异++)" />
         <q-fab-action padding="3px" color="info" icon="keyboard_double_arrow_left" @click="undoAuto" label="自动后退(差异--)" />
+        <q-fab-action padding="3px" color="secondary" :icon="gitHubIcon" @click="toStar" label="give me a star ->"/>
       </q-fab>
     </q-page-sticky>
 
@@ -28,7 +29,8 @@
 </template>
 
 <script>
-import echartsUtils from "../js/echatsUtils";
+import echartsUtils from "../js/echatsUtils"
+import { evaGithub } from '@quasar/extras/eva-icons'
 
 import { defineComponent, onMounted, onUnmounted, onUpdated, ref, toRefs } from 'vue';
 
@@ -55,6 +57,7 @@ export default defineComponent({
   ],
 
   setup(props) {
+    let gitHubIcon = ref(evaGithub)
 
     let {stringA, stringB, drawOb} = toRefs(props)
 
@@ -92,6 +95,7 @@ export default defineComponent({
     })
 
     return {
+      gitHubIcon,
       stringA,
       stringB,
       drawOb,
@@ -140,6 +144,10 @@ export default defineComponent({
         if(fabLabel.value === "可视化回放")
           clearInterval(undoAutoFlag.value)
       }, 500)
+    },
+    toStar() {
+      seamless.value = true
+      window.open("https://github.com/G-haoyu/MyerView")
     }
     };
 
