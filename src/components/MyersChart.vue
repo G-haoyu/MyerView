@@ -122,6 +122,7 @@ export default defineComponent({
       fabLabel.value = echartsUtils.undo()
     },
     redoAuto() {
+      clearInterval(redoAutoFlag.value)
       clearInterval(undoAutoFlag.value)
       seamless.value = true
       redoAutoFlag.value = setInterval(() => {
@@ -132,6 +133,7 @@ export default defineComponent({
     },
     undoAuto() {
       clearInterval(redoAutoFlag.value)
+      clearInterval(undoAutoFlag.value)
       seamless.value = true
       undoAutoFlag.value = setInterval(() => {
         fabLabel.value = echartsUtils.undo()
