@@ -19,7 +19,7 @@
           label-slot
           counter
           debounce="1000"
-          maxlength="200"
+          maxlength="32"
           :rules="[val => !!val.length || '不能为空']"
           >
             <template v-slot:label>
@@ -38,7 +38,7 @@
           label-slot
           counter
           debounce="1000"
-          maxlength="200"
+          maxlength="32"
           :rules="[val => !!val.length || '不能为空']"
         >
           <template v-slot:label>
