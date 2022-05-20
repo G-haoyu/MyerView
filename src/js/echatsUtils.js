@@ -13,7 +13,18 @@ export default {
 
   yAxisLabelLength: 0,
 
+  kArray: [],
+
   drawOb: {},
+
+  showRightPath: true,
+
+  nowD: null,
+
+  nowP: null,
+
+  undoStack: [],
+  undoStack2: [],
 
   init(dom) {
     this.myChart = echarts.init(dom)
@@ -26,6 +37,8 @@ export default {
 
   updateOption(stringA, stringB, drawOb) {
     if(stringA.length !== 0 && stringB.length !== 0) {
+      this.nowD = drawOb.d
+      this.nowP = 0
       this.xAxisLabelValue = stringA.split("")
       this.yAxisLabelValue = stringB.split("")
       this.xAxisLabelValue.unshift("")
@@ -35,12 +48,15 @@ export default {
       this.createOption()
       // drawOb全绘制
       this.drawOb = drawOb
+      this.drawOb["dConts"] = []
       console.log(drawOb)
       console.log(drawOb.allPaths)
       // 正确路径
       let rightPathData = {
+        id: 'rightPath',
         data: drawOb.rightPath,
         type: 'line',
+        clip: true,
         itemStyle: {
           color: 'red'
         },
@@ -49,19 +65,27 @@ export default {
           type: 'solid'
         }
       }
-      this.myOption.series.push(rightPathData)
+      this.myOption.series.unshift(rightPathData)
       // 所有搜索路径
       if(JSON.stringify(drawOb) !== "{}") {
-        for(let j = 0; j < drawOb.allPaths.length; j++) {
+        let dCounts = []
+        for(let j = drawOb.allPaths.length - 1; j >= 0; j--) {
           let dPaths = drawOb.allPaths[j]
-          if(dPaths.d === 0){
+          let d = dPaths.d
+          if(d === 0){
             dPaths.paths[0].path.shift()
           }
-          for(let i = 0; i < dPaths.paths.length; i++) {
+          // 创建d-conters
+          let dCountList = []
+          // 创建kPath
+          for(let i = dPaths.paths.length - 1; i >= 0; i--) {
             let kPaths = dPaths.paths[i]
+            let k = kPaths.k
             let akPathData = {
+              id: 'd'+d+':k'+k,
               data: kPaths.path,
               type: 'line',
+              clip: true,
               itemStyle: {
                 color: 'green'
               },
@@ -70,17 +94,40 @@ export default {
                   type: 'dashed'
               }
             }
-            this.myOption.series.push(akPathData)
+            this.myOption.series.unshift(akPathData)
+            // kPaths末尾元素进入dCountList
+            dCountList.unshift(kPaths.path.at(-1))
           }
+          // 组装dCount
+          dCounts.unshift({d: d, path: dCountList})
+          this.drawOb.dConts = dCounts
+          // 绘制dCount路径
+          let dCountData = {
+            id: 'd'+d,
+            data: dCountList,
+            type: "line",
+            symbolSize: 0,
+            clip: true,
+            endLabel: {
+              show: true,
+              formatter: (val) => {return 'd = ' + d},
+              rotate: 45,
+              distance: 12,
+              offset: [7, -7]
+            },
+            itemStyle: {
+              color: "orange"
+            },
+            lineStyle: {
+                width: 0.6,
+                type: "solid"
+            }
+          }
+          this.myOption.series.push(dCountData)
         }
+        this.reloadChart()
       }
-      this.reloadChart()
-
     }
-  },
-
-  resizeChart() {
-    this.myChart.resize()
   },
 
   reloadChart() {
@@ -88,16 +135,117 @@ export default {
     this.myChart.setOption(this.myOption, true)
   },
 
+  reloadChart2() {
+    console.log(this.myOption)
+    this.myChart.setOption(this.myOption, false)
+  },
+
+  undo() {
+    let result = "可视化回放"
+    if(this.nowD !== null) {
+      // 如果是倒退第一步，先把rightPath移除
+      if(this.drawOb.d === this.nowD && this.showRightPath === true) {
+        this.showRightPath = false
+        // rightPath 位置，从尾开始
+        let location = -this.drawOb.d - 4
+        this.undoStack.unshift(JSON.stringify(this.myOption.series.at(location).data))
+        this.myOption.series.at(location).data = []
+        result = "当前差异："+this.nowD
+      }
+      // 如果还能倒退，且showRightPath为false
+      else if(this.nowD > 0 && this.showRightPath === false) {
+        let location = -this.drawOb.d - 4 - this.nowP - 1
+        this.undoStack.unshift(JSON.stringify(this.myOption.series.at(location).data))
+        let id = this.resolveID(this.myOption.series.at(location).id)
+        // 显示当前 k 线 id.k
+        let kLinesIndex = id.k + this.yAxisLabelLength - 1
+        this.myOption.series.at(-this.drawOb.d - 3).markLine.data = [this.kArray[kLinesIndex]]
+        this.reloadChart2()
+        // 删除当前数据
+        this.myOption.series.at(location).data = []
+        // 判断是否开始一轮 d ，id.d !== nowD，如果开始则先删除dCount
+        if(id.d !== this.nowD || this.nowP === 0) {
+          let location2 = -id.d - 1
+          this.undoStack2.unshift(JSON.stringify(this.myOption.series.at(location2).data))
+          this.myOption.series.at(location2).data = []
+
+          this.nowD = id.d
+        }
+        this.nowP = this.nowP + 1
+        result = "nowD: "+this.nowD+" nowK: "+id.k
+      }
+    }
+    this.reloadChart2()
+    return result
+  },
+
+  redo() {
+    let result = "可视化回放"
+    if(this.nowD !== null) {
+      // 如果是前进最后一步，把rightPath还原
+      if(this.drawOb.d === this.nowD && this.showRightPath === false && this.nowP === 0) {
+        this.showRightPath = true
+        // rightPath 位置，从尾开始
+        let location = -this.drawOb.d - 4
+        this.myOption.series.at(location).data = JSON.parse(this.undoStack.shift())
+        result = "可视化回放"
+      }
+      // 如果还能前进，且showRightPath为false
+      else if(this.nowD <= this.drawOb.d && this.nowP !== 0) {
+        let location = -this.drawOb.d - 4 - this.nowP
+        console.log(location)
+        // this.undoStack.unshift(JSON.stringify(this.myOption.series.at(location).data))
+        let id = this.resolveID(this.myOption.series.at(location).id)
+        // 显示当前 k 线 id.k
+        let kLinesIndex = id.k + this.yAxisLabelLength - 1
+        this.myOption.series.at(-this.drawOb.d - 3).markLine.data = [this.kArray[kLinesIndex]]
+        this.reloadChart2()
+        // 添加当前数据
+        this.myOption.series.at(location).data = JSON.parse(this.undoStack.shift())
+        // 判断是否开始一轮 d ，id.d !== nowD，如果开始则先删除dCount
+        if(id.d !== this.nowD || this.nowP === 1) {
+          let location2 = -id.d - 1
+          // this.undoStack2.unshift(JSON.stringify(this.myOption.series.at(location2).data))
+          this.myOption.series.at(location2).data = JSON.parse(this.undoStack2.shift())
+
+          this.nowD = id.d
+        }
+        this.nowP = this.nowP - 1
+        result = "nowD: "+this.nowD+" nowK: "+id.k
+      }
+    }
+    this.reloadChart2()
+    return result
+  },
+
+  resolveID(id) {
+    let res = {}
+    let sp = id.split(":")
+    let ds = sp[0].split(/d/g)
+    res["d"] = parseInt(ds[1])
+    if(sp.length == 2) {
+      let ks = sp[1].split(/k/g)
+      res["k"] = parseInt(ks[1])
+    }
+    return res
+  },
+
+  resizeChart() {
+    this.myChart.resize()
+  },
+
   getXAxisLabel(index, rightValues, showIndex) {
     if(showIndex)
       return '{textXStyle|'+rightValues[index]+'}\n'+index
     return '{textXStyle|'+rightValues[index]+'}'
   },
+
   getYAxisLabel(index, rightValues, showIndex) {
     if(showIndex)
       return '{textYStyle|'+rightValues[index]+'}'+index
     return '{textYStyle|'+rightValues[index]+'}'
   },
+
   generateKLines(xLength, yLength) {
     let kStart = -(yLength - 1)
     let kEnd = xLength  - 1
@@ -141,16 +289,12 @@ export default {
       }
       kArray.push(ll)
     }
+    this.kArray = kArray
     return kArray
   },
+
   createOption() {
     this.myOption = {
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'cross'
-        }
-      },
       xAxis: [{
         type: 'value',
         position: "top",
@@ -188,11 +332,32 @@ export default {
       }],
       series: [
         {
+          id: 'nowKLine',
           data: [
             [this.xAxisLabelLength, this.yAxisLabelLength]
           ],
           type: 'scatter',
           symbolSize: 0,
+          clip: true,
+          markLine: {
+            silent: true,
+            symbolSize: 0,
+            lineStyle: {
+              color: '#9C27B0',
+              width: 1,
+              opacity: 1
+            },
+            data: []
+          }
+        },
+        {
+          id: 'kLines',
+          data: [
+            [this.xAxisLabelLength, this.yAxisLabelLength]
+          ],
+          type: 'scatter',
+          symbolSize: 0,
+          clip: true,
           markLine: {
             silent: true,
             lineStyle: {

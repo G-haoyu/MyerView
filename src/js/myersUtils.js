@@ -16,6 +16,7 @@ export default {
     this.textBDOM.innerHTML = res.strB
 
     return {
+      d: vss.d,
       allPaths: vss.pathsAll,
       rightPath: so.path
     }
@@ -34,7 +35,7 @@ export default {
     //   {
     //     d: 3,
     //     paths: [
-    //       {path: [[2, 3], [3, 3], [4, 4]]},
+    //       {k: 0, path: [[2, 3], [3, 3], [4, 4]]},
     //       {},
     //       {},
     //       {}
@@ -53,7 +54,7 @@ export default {
       let tmp = {}
       for(let k = -d; k <= d; k += 2) {
         // 仅作绘图记录
-        let kPath = {path: []}
+        let kPath = {k: k, path: []}
 
         let down = ((k == -d) || ((k != d) && v[k + 1] > v[k - 1]))
         let kPrev = down ? k + 1 : k - 1

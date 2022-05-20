@@ -6,7 +6,7 @@
     <q-page-sticky position="bottom-right" :offset="fabPos">
       <q-fab
         v-model="seamless"
-        label="可视化回放"
+        :label="fabLabel"
         vertical-actions-align="center"
         color="deep-orange"
         padding="none xl"
@@ -58,6 +58,7 @@ export default defineComponent({
 
     let {stringA, stringB, drawOb} = toRefs(props)
 
+    let fabLabel = ref("可视化回放")
     let seamless = ref(true)
     let fabPos = ref([18, 18])
     let draggingFab = ref(false)
@@ -65,18 +66,11 @@ export default defineComponent({
     let myChart = ref({});
 
     onMounted(() => {
-      // TODO: 去除初始option
-
       echartsUtils.init(document.getElementById('main'))
-
-      // echartsUtils.updateOption(stringA.value, stringB.value, drawOb.value)
-
-      // // echartsUtils.updateOptionAfter()
 
       window.onresize = () => {
         echartsUtils.resizeChart();
       }
-      // 生成初始Option
 
     })
 
@@ -96,6 +90,7 @@ export default defineComponent({
       stringA,
       stringB,
       drawOb,
+      fabLabel,
       seamless,
       fabPos,
       draggingFab,
@@ -109,11 +104,12 @@ export default defineComponent({
     },
     redoStep() {
       seamless.value = true
-      echartsUtils.reloadChart()
+      // echartsUtils.reloadChart()
+      fabLabel.value = echartsUtils.redo()
     },
     undoStep() {
       seamless.value = true
-      echartsUtils.reloadChart()
+      fabLabel.value = echartsUtils.undo()
     }
     };
 
