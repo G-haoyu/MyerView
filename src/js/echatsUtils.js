@@ -202,12 +202,16 @@ export default {
         // 添加当前数据
         this.myOption.series.at(location).data = JSON.parse(this.undoStack.shift())
         // 判断是否开始一轮 d ，id.d !== nowD，如果开始则先删除dCount
-        if(id.d !== this.nowD || this.nowP === 1) {
-          let location2 = -id.d - 1
+        if(id.d !== this.nowD) {
+          let location2 = -id.d
           // this.undoStack2.unshift(JSON.stringify(this.myOption.series.at(location2).data))
           this.myOption.series.at(location2).data = JSON.parse(this.undoStack2.shift())
 
           this.nowD = id.d
+        } else if (this.nowP === 1) {
+          let location2 = -this.drawOb.d - 1
+          // this.undoStack2.unshift(JSON.stringify(this.myOption.series.at(location2).data))
+          this.myOption.series.at(location2).data = JSON.parse(this.undoStack2.shift())
         }
         this.nowP = this.nowP - 1
         result = "nowD: "+this.nowD+" nowK: "+id.k
