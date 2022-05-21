@@ -19,6 +19,8 @@ export default {
 
   showRightPath: true,
 
+  showKLine: true,
+
   nowD: null,
 
   nowP: null,
@@ -42,6 +44,7 @@ export default {
       this.undoStack = []
       this.undoStack2 = []
       this.showRightPath = true
+      this.showKLine = true
       this.xAxisLabelValue = stringA.split("")
       this.yAxisLabelValue = stringB.split("")
       this.xAxisLabelValue.unshift("")
@@ -198,28 +201,55 @@ export default {
         let location = -this.drawOb.d - 4 - this.nowP
         // this.undoStack.unshift(JSON.stringify(this.myOption.series.at(location).data))
         let id = this.resolveID(this.myOption.series.at(location).id)
-        // 显示当前 k 线 id.k
-        let kLinesIndex = id.k + this.yAxisLabelLength - 1
-        if(kLinesIndex >=0 && kLinesIndex < this.kArray.length)
-          this.myOption.series.at(-this.drawOb.d - 3).markLine.data = [this.kArray[kLinesIndex]]
-        else
-        this.myOption.series.at(-this.drawOb.d - 3).markLine.data = []
+        if(!this.showKLine){
+          this.showKLine = true
+          // 显示当前 k 线 id.k
+          let kLinesIndex = id.k + this.yAxisLabelLength - 1
+          if(kLinesIndex >=0 && kLinesIndex < this.kArray.length)
+            this.myOption.series.at(-this.drawOb.d - 3).markLine.data = [this.kArray[kLinesIndex]]
+          else
+            this.myOption.series.at(-this.drawOb.d - 3).markLine.data = []
           this.reloadChart2()
-        // 添加当前数据
-        this.myOption.series.at(location).data = JSON.parse(this.undoStack.shift())
-        // 判断是否开始一轮 d ，id.d !== nowD，如果开始则先删除dCount
-        if(id.d !== this.nowD) {
-          let location2 = -id.d
-          // this.undoStack2.unshift(JSON.stringify(this.myOption.series.at(location2).data))
-          this.myOption.series.at(location2).data = JSON.parse(this.undoStack2.shift())
-
-          this.nowD = id.d
-        } else if (this.nowP === 1) {
-          let location2 = -this.drawOb.d - 1
-          // this.undoStack2.unshift(JSON.stringify(this.myOption.series.at(location2).data))
-          this.myOption.series.at(location2).data = JSON.parse(this.undoStack2.shift())
         }
-        this.nowP = this.nowP - 1
+        // // 显示当前 k 线 id.k
+        // let kLinesIndex = id.k + this.yAxisLabelLength - 1
+        // if(kLinesIndex >=0 && kLinesIndex < this.kArray.length)
+        //   this.myOption.series.at(-this.drawOb.d - 3).markLine.data = [this.kArray[kLinesIndex]]
+        // else
+        // this.myOption.series.at(-this.drawOb.d - 3).markLine.data = []
+        //   this.reloadChart2()
+        // 添加当前数据
+        else {
+          this.showKLine = false
+          this.myOption.series.at(location).data = JSON.parse(this.undoStack.shift())
+          // 判断是否开始一轮 d ，id.d !== nowD，如果开始则先删除dCount
+          if(id.d !== this.nowD) {
+            let location2 = -id.d
+            // this.undoStack2.unshift(JSON.stringify(this.myOption.series.at(location2).data))
+            this.myOption.series.at(location2).data = JSON.parse(this.undoStack2.shift())
+
+            this.nowD = id.d
+          } else if (this.nowP === 1) {
+            let location2 = -this.drawOb.d - 1
+            // this.undoStack2.unshift(JSON.stringify(this.myOption.series.at(location2).data))
+            this.myOption.series.at(location2).data = JSON.parse(this.undoStack2.shift())
+          }
+          this.nowP = this.nowP - 1
+        }
+        // this.myOption.series.at(location).data = JSON.parse(this.undoStack.shift())
+        // // 判断是否开始一轮 d ，id.d !== nowD，如果开始则先删除dCount
+        // if(id.d !== this.nowD) {
+        //   let location2 = -id.d
+        //   // this.undoStack2.unshift(JSON.stringify(this.myOption.series.at(location2).data))
+        //   this.myOption.series.at(location2).data = JSON.parse(this.undoStack2.shift())
+
+        //   this.nowD = id.d
+        // } else if (this.nowP === 1) {
+        //   let location2 = -this.drawOb.d - 1
+        //   // this.undoStack2.unshift(JSON.stringify(this.myOption.series.at(location2).data))
+        //   this.myOption.series.at(location2).data = JSON.parse(this.undoStack2.shift())
+        // }
+        // this.nowP = this.nowP - 1
         result = "nowD: "+this.nowD+" nowK: "+id.k
       }
     }

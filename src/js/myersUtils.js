@@ -165,9 +165,6 @@ export default {
 
         if (m - s == 1) {
           // 删除,strA有strB没有
-          let span = document.createElement("span")
-          span.className = "tdel"
-          span.innerHTML = strA[s]
           resStrA += "<span class=\"tdel\">"+strA[s]+"</span>"
         } else {
           // 增加
