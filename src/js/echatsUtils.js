@@ -93,6 +93,7 @@ export default {
               data: kPaths.path,
               type: 'line',
               showSymbol: false,
+              z: 20,
               clip: true,
               itemStyle: {
                 color: 'green'
