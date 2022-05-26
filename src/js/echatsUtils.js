@@ -61,6 +61,8 @@ export default {
         id: 'rightPath',
         data: drawOb.rightPath,
         type: 'line',
+        showSymbol: false,
+        z: 10,
         clip: true,
         itemStyle: {
           color: 'red'
@@ -90,13 +92,14 @@ export default {
               id: 'd'+d+':k'+k,
               data: kPaths.path,
               type: 'line',
+              showSymbol: false,
               clip: true,
               itemStyle: {
                 color: 'green'
               },
               lineStyle: {
                   width: 2,
-                  type: 'dashed'
+                  type: 'solid'
               }
             }
             this.myOption.series.unshift(akPathData)
@@ -111,7 +114,7 @@ export default {
             id: 'd'+d,
             data: dCountList,
             type: "line",
-            symbolSize: 0,
+            symbolSize: 6,
             clip: true,
             endLabel: {
               show: true,
@@ -380,7 +383,7 @@ export default {
           clip: true,
           markLine: {
             silent: true,
-            symbolSize: 0,
+            symbol: ['none', 'arrow'],
             lineStyle: {
               color: '#9C27B0',
               width: 1,
@@ -399,10 +402,14 @@ export default {
           clip: true,
           markLine: {
             silent: true,
+            symbol: ['none', 'none'],
             lineStyle: {
               color: '#333',
               width: 0.8,
               opacity: 0.4
+            },
+            label: {
+              distance: [18,25]
             },
             data: this.generateKLines(this.xAxisLabelLength, this.yAxisLabelLength)
           }
