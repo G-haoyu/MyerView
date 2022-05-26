@@ -93,7 +93,6 @@ export default {
               data: kPaths.path,
               type: 'line',
               showSymbol: false,
-              z: 20,
               clip: true,
               itemStyle: {
                 color: 'green'
@@ -116,6 +115,7 @@ export default {
             data: dCountList,
             type: "line",
             symbolSize: 6,
+            z: 20,
             clip: true,
             endLabel: {
               show: true,
