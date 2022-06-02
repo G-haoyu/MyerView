@@ -1,8 +1,8 @@
 {
-  "name": "myer_view",
+  "name": "myers_view",
   "version": "0.0.1",
-  "description": "An online visual website based on Myer's diff algorithm",
-  "productName": "MyerView",
+  "description": "An online visual website based on Myers diff algorithm",
+  "productName": "MyersView",
   "author": "Oto_G <421739728@qq.com>",
   "private": true,
   "scripts": {

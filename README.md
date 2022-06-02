@@ -1,4 +1,4 @@
-# Myer's 差分算法可视化
+# Myers 差分算法可视化
 
 *Author: Oto_G*
 
@@ -6,13 +6,13 @@
 
 ## 简介
 
-**在线预览 [Myer's View](https://myer-view.vercel.app/)**
+**在线预览 [Myers View](https://myer-view.vercel.app/)**
 
-使用 [Quasar](https://github.com/quasarframework/quasar)（基于 [Vue3](https://github.com/vuejs/core) ）的前端框架进行开发的 [Myer's 差分算法](http://xmailserver.org/diff2.pdf) 可视化应用
+使用 [Quasar](https://github.com/quasarframework/quasar)（基于 [Vue3](https://github.com/vuejs/core) ）的前端框架进行开发的 [Myers 差分算法](http://xmailserver.org/diff2.pdf) 可视化应用
 
-- 图表库使用 [ECharts](https://github.com/apache/echarts) 
+- 图表库使用 [ECharts](https://github.com/apache/echarts)
 
-感谢 [简析Myers - 掘金 (juejin.cn)](https://juejin.cn/post/6844903613790158862) ，其实现的JS版 Myer's 算法已经逐行分析，解析见 [Myer's 差分算法解析](https://github.com/G-haoyu/MyerView#myers-%E5%B7%AE%E5%88%86%E7%AE%97%E6%B3%95%E8%A7%A3%E6%9E%90)
+感谢 [简析Myers - 掘金 (juejin.cn)](https://juejin.cn/post/6844903613790158862) ，其实现的JS版 Myers 算法已经逐行分析，解析见 [Myers 差分算法解析](https://github.com/G-haoyu/MyerView#myers-%E5%B7%AE%E5%88%86%E7%AE%97%E6%B3%95%E8%A7%A3%E6%9E%90)
 
 ## 相关命令
 ```bash
@@ -29,7 +29,7 @@ quasar dev
 quasar build
 ```
 
-## Myer's 差分算法解析
+## Myers 差分算法解析
 
 ```js
 function myers(stra, strb) {
@@ -38,15 +38,15 @@ function myers(stra, strb) {
     // 字符串 b 的长度为 m
     let m = strb.length
 
-    /* 
+    /*
     动态规划回溯前轮计算结果用，结构为 k: x ，
     存储的是该截距（k）目前能到达的最远端 x ，
-    且 k 满足公式 k = x - y 
+    且 k 满足公式 k = x - y
     */
     let v = {
       '1': 0
     }
-    /* 
+    /*
     存储的是每一步差异（d）中的所有截距（k）
     能到达的最远端 x 值，用于计算差异路径（d-path）
     结构为 d: {k : x}
@@ -61,19 +61,19 @@ function myers(stra, strb) {
     // 差异d，最坏情况 n+m 即两字符串完全不同
     for (d = 0; d <= n + m; d++) {
       let tmp = {}
-      /* 
+      /*
       斜线不计入循环，只有两个方向 → || ↓
       这里使用剪枝思想，使k不用遍历全表
       */
       for (let k = -d; k <= d; k += 2) {
-        /* 
+        /*
         判断是否是通过 + 到达的待测点，+ 的情况为：
         当前截距等于负差异（首次循环，也就是左边界）或者
         当前截距不等于正差异（末次循环，也就是上边界）且
         上一截距的x大于下一截距的x（体现优先删除）
         */
         let down = ((k == -d) || ((k != d) && v[k + 1] > v[k - 1]))
-        /* 
+        /*
         如果是 + 方式到的该截距，
         则说明该截距的前一步是从上截距过来的，否则是下截距下来的
         */
@@ -88,7 +88,7 @@ function myers(stra, strb) {
         // 声明当前可能的坐标（还未考虑走斜线）
         let xEnd = xMid
         let yEnd = yMid
-        
+
         /*
         考虑走斜线（对字符串a、b进行比较，
         如果当前x、y所在字符串相同则走斜线）
@@ -97,13 +97,13 @@ function myers(stra, strb) {
           xEnd++
           yEnd++
         }
-        
+
         // 更新截距k所能到的最远端xEnd，yEnd不必记录可以计算得到
         // 动态规划回溯子问题的实现
         v[k] = xEnd
         // 记录当前截距的最新端点
         tmp[k] = xEnd
-  
+
         /*
         如果 xEnd 和 yEnd 到达了各自字符串的末端，
         说明路径寻找到了终点，可以结束寻找
@@ -119,19 +119,19 @@ function myers(stra, strb) {
           break loop
         }
       }
-      
+
       // 刷新当前差异下能到达的最远端
       vs[d] = tmp
     }
   }
-  
+
   // 由后向前回溯
   function solution(vs, n, m, d) {
     // snakes存 + - 步骤
     let snakes = []
     // 存放当前搜索的位置
     let p = { x: n, y: m }
-    
+
     // 两文本的差异数量已知，往前倒推步骤
     for (; d > 0; d--) {
       // 取出最后一步的差异所有能到达的点 v[k], k∈[-d, d]
@@ -140,12 +140,12 @@ function myers(stra, strb) {
       let vPrev = vs[d-1]
       // 计算当前位置的截距，首次循环是终点所在截距k
       let k = p.x - p.y
-  
+
       // 获取当前截距的坐标
       let xEnd = v[k]
       let yEnd = xEnd - k
-      
-      /* 
+
+      /*
       判断该步是通过 + 还是 - 操作得到的，分两类：
       1、当前截距与负差异相同
         1.1 这种情况说明当前差异除了走斜线以外，其余都是走 + 完成的（TODO: 可优化）
@@ -156,24 +156,24 @@ function myers(stra, strb) {
       let down = ((k == -d) || ((k != d) && (vPrev[k + 1] > vPrev[k - 1])))
       // 如果是通过 + 到达的该点，则前一步的截距在上侧，即 k + 1 ，反之则 k - 1
       let kPrev = down ? k + 1 : k - 1
-      // 获得真正的前驱点（已包含走斜线情况）      
+      // 获得真正的前驱点（已包含走斜线情况）
       let xStart = vPrev[kPrev]
       let yStart = xStart - kPrev
       // 获得走斜线的开始点，形象的称为mid，（对于没有走斜线的情况，得到的就是当前点）
       let xMid = down ? xStart : xStart + 1
       let yMid = xMid - k
-      
+
       // 将当前前驱点、斜线开始点（LCS）、当前点的 x 值压栈入 snakes
       snakes.unshift([xStart, xMid, xEnd])
-      
+
       // 更新当前计算的位置
       p.x = xStart
       p.y = yStart
     }
-  
+
     return snakes
   }
-  
+
   function printRes(snakes, stra, strb) {
     let grayColor = '^'
     let redColor = '-'
@@ -181,7 +181,7 @@ function myers(stra, strb) {
     let consoleStr = ''
     let args = []
     let yOffset = 0
-    
+
     snakes.forEach((snake, index) => {
       // 获取步骤的前驱（开始） x
       let s = snake[0]
@@ -191,7 +191,7 @@ function myers(stra, strb) {
       let e = snake[2]
       // LCS的起点（TODO: 可以不新增large变量，snake中记录的m已经记录了LCS的开始位置）
       // let large = s
-      
+
       // 如果是第一个差异，并且差异的开始点不是字符串头（即两字符串在开始部分有相同子字符串）
       // 只会在snakes的forEach中的一个出现
       if (index === 0 && s !== 0) {
@@ -203,7 +203,7 @@ function myers(stra, strb) {
           yOffset++
         }
       }
-      
+
       // 如果该子串的差异是 - 操作
       // 删除
       if (m - s == 1) {
@@ -220,7 +220,7 @@ function myers(stra, strb) {
         // b字符串当前位置继续右移
         yOffset++
       }
-      
+
       // LCS部分，当前终点位置 e 减去 LCS的开始位置，即为相同字串的长度
       // 不变
       // for (let i = 0; i < e - large; i++) {
@@ -232,14 +232,14 @@ function myers(stra, strb) {
         yOffset++
       }
     })
-  
+
     console.log(consoleStr, ...args)
   }
-  
+
   // test部分
   let s1 = 'ABCABBA'
   let s2 = 'CBABAC'
   myers(s1, s2)
-  
+
 ```
 
