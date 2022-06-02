@@ -1,12 +1,12 @@
 <template>
   <q-page class="q-pa-md">
     <div class="row justify-center">
-      <strong class="text-h2">Myer's <span class="text-deep-orange">diff</span> algorithm</strong>
+      <strong class="text-h2">Myers <span class="text-deep-orange">diff</span> algorithm</strong>
     </div>
 
     <div class="row justify-center">
       <h5>
-        Myer's差分算法可视化
+        Myers差分算法可视化
         <q-badge align="top" color="primary">v1.0</q-badge>
       </h5>
     </div>
