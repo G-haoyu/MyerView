@@ -12,7 +12,7 @@
 
 - 图表库使用 [ECharts](https://github.com/apache/echarts)
 
-感谢 [简析Myers - 掘金 (juejin.cn)](https://juejin.cn/post/6844903613790158862) ，其实现的JS版 Myers 算法已经逐行分析，解析见 [Myers 差分算法解析](https://github.com/G-haoyu/MyerView#myers-%E5%B7%AE%E5%88%86%E7%AE%97%E6%B3%95%E8%A7%A3%E6%9E%90)，C++版本Myers算法实现也已给出，见
+感谢 [简析Myers - 掘金 (juejin.cn)](https://juejin.cn/post/6844903613790158862) ，其实现的JS版 Myers 算法已经逐行分析，解析见 [Myers 差分算法解析](https://github.com/G-haoyu/MyerView#myers-%E5%B7%AE%E5%88%86%E7%AE%97%E6%B3%95%E8%A7%A3%E6%9E%90)，C++版本Myers算法实现也已给出，见[C++版Myers差分算法实现](https://github.com/G-haoyu/MyerView#c版myers差分算法实现)
 
 ## 相关命令
 ```bash
