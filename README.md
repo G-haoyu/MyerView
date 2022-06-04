@@ -12,7 +12,7 @@
 
 - 图表库使用 [ECharts](https://github.com/apache/echarts)
 
-感谢 [简析Myers - 掘金 (juejin.cn)](https://juejin.cn/post/6844903613790158862) ，其实现的JS版 Myers 算法已经逐行分析，解析见 [Myers 差分算法解析](https://github.com/G-haoyu/MyerView#myers-%E5%B7%AE%E5%88%86%E7%AE%97%E6%B3%95%E8%A7%A3%E6%9E%90)
+感谢 [简析Myers - 掘金 (juejin.cn)](https://juejin.cn/post/6844903613790158862) ，其实现的JS版 Myers 算法已经逐行分析，解析见 [Myers 差分算法解析](https://github.com/G-haoyu/MyerView#myers-%E5%B7%AE%E5%88%86%E7%AE%97%E6%B3%95%E8%A7%A3%E6%9E%90)，C++版本Myers算法实现也已给出，见
 
 ## 相关命令
 ```bash
@@ -226,7 +226,7 @@ function myers(stra, strb) {
       // for (let i = 0; i < e - large; i++) {
       for (let i = 0; i < e - m; i++) {
         // TODO: 此处large可以使用m代替
-        consoleStr += `%c${stra[large+i]}`
+        consoleStr += `%c${stra[m+i]}`
         args.push(grayColor)
         // b字符串当前位置继续右移
         yOffset++
@@ -240,6 +240,247 @@ function myers(stra, strb) {
   let s1 = 'ABCABBA'
   let s2 = 'CBABAC'
   myers(s1, s2)
+
+```
+
+## C++版Myers差分算法实现
+
+```c++
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <map>
+#include <vector>
+#include <malloc.h>
+using namespace std;
+
+typedef map<int, int> MAP_INT_INT;
+
+class MyersUtils {
+  public:
+  	// 初始化 
+    MyersUtils();
+    // 生成编辑图 
+    void myers();
+    // 回溯正确路线 
+    void solution();
+    // 显示差异 
+    void show();
+
+  private:
+  	// 字符串A 
+    string sstrA;
+    // 字符串B
+    string sstrB;
+    // 字符串A 转char[] 
+    char* strA;
+    // 字符串B 转char[] 
+    char* strB;
+    // 字符串A长度 
+    int m;
+    // 字符串B长度 
+    int n;
+    // 两字符串差异数 
+    int d;
+    // 编辑图 
+    vector<MAP_INT_INT> vs;
+    // 完成路径 
+    vector<int *> snakes;
+};
+
+MyersUtils::MyersUtils() {
+    cout << "输入字符串A" << endl;
+    cin>>sstrA;
+    cout << "输入字符串B" << endl;
+    cin>>sstrB;
+    
+    m = sstrA.length();
+    n = sstrB.length();
+    
+    strA = new char[m + 1];
+    strB = new char[n + 1];
+    
+    strcpy(strA, sstrA.c_str());
+    strcpy(strB, sstrB.c_str()); 
+    
+    d = 0;
+	
+    myers();
+    solution();
+    show();
+}
+
+void MyersUtils::myers() {
+	/* 
+    动态规划回溯前轮计算结果用，结构为 k: x ，
+    存储的是该截距（k）目前能到达的最远端 x ，
+    且 k 满足公式 k = x - y 
+    */
+    MAP_INT_INT v;
+    v.insert(MAP_INT_INT::value_type(1, 0));
+    /* 编辑图： 
+    存储的是每一步差异（d）中的所有截距（k）
+    能到达的最远端 x 值，用于计算差异路径（d-path）
+    结构为 d: {k : x}
+    */
+    vs.push_back(v);
+    
+    // 终止标志 
+    bool isFinish = false;
+    
+    // 最坏情况 d = n + m 即两字符串完全不同
+    for(d; d <= m + n && !isFinish; d++) {
+    	MAP_INT_INT tmp;
+    	/* 
+     	斜线不计入循环，只有两个方向 → || ↓
+      	同时，这里使用剪枝思想，使k只用遍历一半 
+      	*/
+    	for(int k = -d; k <= d; k += 2) {
+    		/* 
+	        判断是否是通过 + 到达的待测点，+ 的情况为：
+	        当前截距等于负差异（首次循环，也就是左边界）或者
+	        当前截距不等于正差异（末次循环，也就是上边界）且
+	        上一截距的x大于下一截距的x（体现优先删除）
+	        */
+    		bool isDown = ((k == -d) || ((k != d) && v[k + 1] > v[k - 1]));
+    		/* 
+	        如果是 + 方式到的该截距，
+	        则说明该截距的前一步是从上截距过来的，否则是下截距下来的
+	        */
+    		int kPrev = isDown ? k + 1 : k - 1;
+    		// 获取前一步的 x 坐标 xStart
+    		int xStart = v[kPrev];
+    		// 获取可能的当前点坐标，如果是 + 方式则x轴坐标不变，否则横坐标 +1
+    		int xMid = isDown ? xStart : xStart + 1;
+    		// y轴通过 k = x - y 计算得出
+    		int yMid = xMid - k;
+    		// 声明当前可能的坐标（还未考虑走斜线）
+    		int xEnd = xMid;
+    		int yEnd = yMid;
+	        // 考虑走斜线（对字符串a、b进行比较，如果当前x、y所在字符串相同则走斜线）
+			while(xEnd < m && yEnd < n && strA[xEnd] == strB[yEnd]) {
+				xEnd++;
+				yEnd++;
+			}
+			
+			// 更新截距k所能到的最远端xEnd，yEnd不必记录可以计算得到
+        	// 动态规划回溯子问题的实现
+    		v[k] = xEnd;
+    		// 当前 d 下的各条snake记录 
+    		tmp[k] = xEnd;
+    		
+    		/*
+	        如果 xEnd 和 yEnd 到达了各自字符串的末端，
+	        说明路径寻找到了终点，可以结束寻找
+	        */
+    		if(xEnd == m && yEnd == n) {
+    			isFinish = true;
+    			break;
+			}
+		}
+		// 将当前 d 下的所有snake存入编辑图 
+		vs.push_back(tmp);
+	}
+	
+	d = d - 1;
+	vs.erase(vs.begin());
+}
+
+// 由后向前回溯，找出正确差异路径 
+void MyersUtils::solution() {
+	// 存放当前搜索的位置
+	int p[2] = {m, n};
+	// 两文本的差异数量已知，往前倒推步骤
+	for(d; d > 0; d--) {
+		// 取出最后一步的差异所有能到达的点 v[k], k∈[-d, d]
+		MAP_INT_INT v = vs[d];
+		// 取出前一步的差异所有能到达的点
+		MAP_INT_INT vPrev = vs[d-1];
+		// 计算当前位置的截距，首次循环是终点所在截距k
+		int k = p[0] - p[1];
+		// 获取当前截距的 x 坐标
+		int xEnd = v[k];
+		/* 
+	      判断该步是通过 + 还是 - 操作得到的，分两类：
+	      1、当前截距与负差异相同
+	        1.1 这种情况说明当前差异除了走斜线以外，其余都是走 + 完成的（TODO: 可优化）
+	      2、当前截距不等于正差异 且 前一步差异所到达的点中，
+	      当前截距的上侧截距能到达的最远点的x值比下策截距能到达的最远点的x值大
+	        2.1 该判断的后半部分保证了删除先于增加的设计要求
+      	*/
+		bool isDown = ((k == -d) || ((k != d) && (vPrev[k + 1] > vPrev[k - 1])));
+		// 如果是通过 + 到达的该点，则前一步的截距在上侧，即 k + 1 ，反之则 k - 1
+		int kPrev = isDown ? k + 1 : k - 1;
+		// 获得真正的前驱点（已包含走斜线情况）  
+		int xStart = vPrev[kPrev];
+		int yStart = xStart - kPrev;
+		// 获得走斜线的开始点，形象的称为mid，（对于没有走斜线的情况，得到的就是当前点）
+		int xMid = isDown ? xStart : xStart + 1;
+		
+		// 将当前前驱点、斜线开始点、当前点的 x 值存入 snakes
+		int* snake = (int*)malloc(sizeof(int) * 3);
+		*snake = xStart;
+		*(snake+1) = xMid;
+		*(snake+2) = xEnd;
+		snakes.push_back(snake);
+		
+		// 更新当前计算的位置
+		p[0] = xStart;
+		p[1] = yStart;
+	}
+}
+
+void MyersUtils::show() {
+	string res = "";
+	// strB 的位置偏移记录 
+	int strBOffset = 0;
+	
+	for(int i = snakes.size() - 1; i >= 0; i--) {
+		// 获取当前snake 
+		int * snake = snakes[i];
+		// 获取步骤的前驱（开始） x
+		int s = *snake;
+		// 获取步骤的相同部分的开始 x
+		int m = *(snake + 1);
+		// 获取步骤的终点 x
+		int e = *(snake + 2);
+		
+		// 如果是第一个差异，并且差异的开始点不是字符串头
+		if(i == snakes.size() - 1 && s != 0) {
+			// 遍历相同字符，一直到第一个差异出现的位置 
+			for(int j = 0; j < s; j++) {
+				string str(1, strA[j]);
+				res += " =:" + str;
+				strBOffset++;
+			}
+		}
+		
+		// 如果该子串的差异是 - 操作，则是删减字符 
+		if(m - s == 1) {
+			string str(1, strA[s]);
+			res += " -:" + str;
+		} 
+		// 如果该子串的差异是 + 操作，则是增加字符 
+		else {
+			string str(1, strB[strBOffset]);
+			res += " +:" + str;
+			strBOffset++;	
+		}
+		// 走斜边情况，遍历相同字符串 
+		for(int index = 0; index < e - m; index++) {
+			string str(1, strA[m + index]);
+			res += " =:" + str;
+			strBOffset++;	
+		}
+	}
+	
+	cout << res << endl;
+}
+
+int main() {
+	MyersUtils m;
+	return 0;
+} 
 
 ```
 
