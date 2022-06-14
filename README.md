@@ -8,6 +8,8 @@
 
 **在线预览 [Myers View](https://myer-view.vercel.app/)**
 
+**详细介绍 [Myers差分算法的理解、实现、可视化](https://www.cnblogs.com/oto-G/p/16357245.html)**
+
 使用 [Quasar](https://github.com/quasarframework/quasar)（基于 [Vue3](https://github.com/vuejs/core) ）的前端框架进行开发的 [Myers 差分算法](http://xmailserver.org/diff2.pdf) 可视化应用
 
 - 图表库使用 [ECharts](https://github.com/apache/echarts)
