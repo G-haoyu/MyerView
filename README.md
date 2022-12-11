@@ -6,7 +6,7 @@
 
 ## 简介
 
-**在线预览 [Myers View](https://myer-view.vercel.app/)**
+**在线预览 [Myers View](https://myers-view.oto-g.top/)**
 
 **详细介绍 [Myers差分算法的理解、实现、可视化](https://www.cnblogs.com/oto-G/p/16357245.html)**
 
